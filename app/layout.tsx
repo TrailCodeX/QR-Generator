@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "QR Magic",
-  description: "Generate, download and save QR codes to Google Cloud Storage.",
+  description: "Generate QR codes from any link or text and download them as PNG.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

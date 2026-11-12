@@ -9,4 +9,4 @@ next-env.d.ts
 *.pem
 *service-account*.json
 *-key.json
-gcp-key*.json
+

@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Produces a minimal self-contained server for the Cloud Run Docker image.
-  output: "standalone",
-  // Keep the GCP SDK out of the bundle; it is only ever loaded server-side.
-  serverExternalPackages: ["@google-cloud/storage"],
+  // Static export: `npm run build` writes a plain HTML/JS site to `out/`,
+  // which any static host can serve.
+  output: "export",
 };
 
 export default nextConfig;

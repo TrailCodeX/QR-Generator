@@ -12,14 +12,14 @@ export default function Home() {
           QR Magic
         </h1>
         <p className="mt-3 text-slate-300">
-          Turn any link or text into a QR code — download it or save it to the cloud.
+          Turn any link or text into a QR code and download it as a PNG.
         </p>
       </header>
 
       <QRGenerator />
 
       <footer className="mt-auto pt-12 text-center text-xs text-slate-400">
-        Images are stored in a private Google Cloud Storage bucket and shared via signed URLs.
+        QR codes are generated in your browser. Nothing is uploaded.
       </footer>
     </main>
   );

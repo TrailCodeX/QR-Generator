@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import QRCode from "qrcode";
-import {
-  CircleAlert,
-  CircleCheck,
-  CloudUpload,
-  Download,
-  ExternalLink,
-  LoaderCircle,
-  QrCode,
-  Sparkles,
-} from "lucide-react";
+import { CircleAlert, Download, LoaderCircle, QrCode, Sparkles } from "lucide-react";
 
 const MAX_LENGTH = 1500;
-
-type UploadState =
-  | { status: "idle" }
-  | { status: "uploading" }
-  | { status: "success"; fileName: string; signedUrl: string; expiresAt: string }
-  | { status: "error"; message: string };
 
 export default function QRGenerator() {
   const [text, setText] = useState("");
@@ -27,7 +12,6 @@ export default function QRGenerator() {
   const [encodedText, setEncodedText] = useState("");
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
-  const [upload, setUpload] = useState<UploadState>({ status: "idle" });
 
   async function generate(e?: React.FormEvent) {
     e?.preventDefault();
@@ -38,7 +22,6 @@ export default function QRGenerator() {
     }
     setGenerating(true);
     setGenError(null);
-    setUpload({ status: "idle" });
     try {
       const url = await QRCode.toDataURL(value, {
         width: 512,
@@ -63,35 +46,6 @@ export default function QRGenerator() {
     a.download = `qr-magic-${Date.now()}.png`;
     a.click();
   }
-
-  async function saveToCloud() {
-    if (!qrDataUrl) return;
-    setUpload({ status: "uploading" });
-    try {
-      const blob = await (await fetch(qrDataUrl)).blob();
-      const form = new FormData();
-      form.append("file", blob, "qr.png");
-
-      const res = await fetch("/api/qr/upload", { method: "POST", body: form });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.success) {
-        throw new Error(data?.error ?? `Upload failed (HTTP ${res.status}).`);
-      }
-      setUpload({
-        status: "success",
-        fileName: data.fileName,
-        signedUrl: data.signedUrl,
-        expiresAt: data.expiresAt,
-      });
-    } catch (err) {
-      setUpload({
-        status: "error",
-        message: err instanceof Error ? err.message : "Upload failed.",
-      });
-    }
-  }
-
-  const uploading = upload.status === "uploading";
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -161,57 +115,14 @@ export default function QRGenerator() {
           </p>
         )}
 
-        <div className="mt-5 grid w-full max-w-72 grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={download}
-            disabled={!qrDataUrl}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Download className="h-4 w-4" /> PNG
-          </button>
-          <button
-            type="button"
-            onClick={saveToCloud}
-            disabled={!qrDataUrl || uploading}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/40 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {uploading ? (
-              <LoaderCircle className="h-4 w-4 animate-spin" />
-            ) : (
-              <CloudUpload className="h-4 w-4" />
-            )}
-            {uploading ? "Saving…" : "Save to Cloud"}
-          </button>
-        </div>
-
-        <div aria-live="polite" className="w-full max-w-72">
-          {upload.status === "success" && (
-            <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/15 p-3 text-sm text-emerald-100">
-              <p className="flex items-center gap-2 font-semibold">
-                <CircleCheck className="h-4 w-4 shrink-0" /> Saved to Google Cloud
-              </p>
-              <p className="mt-1 break-all text-xs text-emerald-200/80">{upload.fileName}</p>
-              <a
-                href={upload.signedUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold underline underline-offset-2 hover:text-white"
-              >
-                Open signed link <ExternalLink className="h-3 w-3" />
-              </a>
-              <p className="mt-1 text-[11px] text-emerald-200/70">
-                Link expires {new Date(upload.expiresAt).toLocaleTimeString()}
-              </p>
-            </div>
-          )}
-          {upload.status === "error" && (
-            <div className="mt-4 flex items-start gap-2 rounded-2xl border border-rose-400/30 bg-rose-500/15 p-3 text-sm text-rose-100">
-              <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{upload.message}</span>
-            </div>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={download}
+          disabled={!qrDataUrl}
+          className="mt-5 inline-flex w-full max-w-72 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/40 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <Download className="h-4 w-4" /> Download PNG
+        </button>
       </section>
     </div>
   );

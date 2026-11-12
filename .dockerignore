@@ -1,8 +1,0 @@
-node_modules
-.next
-.git
-.env*
-*service-account*.json
-*-key.json
-gcp-key*.json
-README.md
