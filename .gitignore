@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# Secrets — never commit credentials
+.env*
+*.pem
+*service-account*.json
+*-key.json
+gcp-key*.json
